@@ -3,6 +3,7 @@ using CupCakes.DTOs;
 using CupCakes.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CupCakes.Services;
 
 namespace CupCakes.Controllers
 {
@@ -10,11 +11,14 @@ namespace CupCakes.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _context;
 
-        public AuthController(AppDbContext context)
+        private readonly AppDbContext _context;
+        private readonly JwtService _jwtService;
+
+        public AuthController(AppDbContext context, JwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
         [HttpPost("registrar")]
@@ -76,9 +80,12 @@ namespace CupCakes.Controllers
                 });
             }
 
+            var token = _jwtService.GerarToken(usuario);
+
             return Ok(new
             {
                 mensagem = "Login realizado com sucesso.",
+                token,
                 usuario = new
                 {
                     usuario.Id,
